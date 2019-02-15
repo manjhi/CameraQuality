@@ -1,0 +1,48 @@
+private ImageView registerImage; 
+  private String imagepath = "";
+
+    File photoFile;
+    
+    private static final int CAMERA_REQUEST = 121;
+
+  private void cameraIntent() {
+
+
+        Intent pictureIntent = new Intent(
+                MediaStore.ACTION_IMAGE_CAPTURE);
+        if (pictureIntent.resolveActivity(getPackageManager()) != null) {
+            //Create a file to store the image
+            photoFile = null;
+            photoFile = ImageUtil.getTemporaryCameraFile();
+            if (photoFile != null) {
+                Uri uri = FileProvider.getUriForFile(activity, BuildConfig.APPLICATION_ID + ".provider", photoFile);
+
+
+                pictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                startActivityForResult(pictureIntent,
+                        CAMERA_REQUEST);
+            }
+        }
+    }
+
+
+
+      @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == Activity.RESULT_OK) {
+
+           if (requestCode == CAMERA_REQUEST) {
+                imagepath = ImageUtil.compressImage(photoFile.getAbsolutePath());
+
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 8;
+                Bitmap mBitmapInsurance = BitmapFactory.decodeFile(photoFile.getAbsolutePath(), options);
+                registerImage.setImageBitmap(mBitmapInsurance);
+                photoFile.delete();
+            }
+
+        }
+
+    }
